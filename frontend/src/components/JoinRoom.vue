@@ -57,7 +57,6 @@ export default {
         },
     },
     created() {
-        // Ascolta l'evento 'room-update' emesso dal websocket.js
         window.addEventListener("room-update", (event) => {
             const { users, score, roomId } = event.detail;
             if (roomId === this.joinRoomId) {
