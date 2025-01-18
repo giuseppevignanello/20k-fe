@@ -8,6 +8,10 @@
     <div v-show="showCreateRoomModal">
 
     </div>
+    <div v-if="roomId != null">
+        Room id = {{ roomId }},
+    </div>
+
 </template>
 
 <script>
