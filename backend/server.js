@@ -30,7 +30,14 @@ app.post("/create-room", (req, res) => {
 
 app.get("/room-exists/:roomId", (req, res) => {
   const roomId = req.params.roomId;
-  res.json({ exists: !!rooms[roomId] });
+  const room = rooms[roomId];
+  if (!room) {
+    return res.json({ exists: false });
+  }
+  if (room.users.length >= room.players) {
+    return res.json({ exists: true, full: true });
+  }
+  return res.json({ exists: true, full: false });
 });
 
 const server = app.listen(port, () => {
@@ -51,6 +58,13 @@ wss.on("connection", (socket, req) => {
     if (message.type === "join-room") {
       const { roomId, username } = message;
       if (rooms[roomId]) {
+        if (rooms[roomId].users.length >= rooms[roomId].players) {
+          socket.send(
+            JSON.stringify({ type: "room-full", message: "Room is full" })
+          );
+          socket.close();
+          return;
+        }
         rooms[roomId].clients.add(socket);
         rooms[roomId].users.push(username);
         socket.roomId = roomId;
@@ -66,7 +80,6 @@ wss.on("connection", (socket, req) => {
           })
         );
 
-        // Broadcasting a tutti gli altri utenti della stanza
         broadcast(roomId, {
           type: "room-update",
           users: rooms[roomId].users,
@@ -86,8 +99,7 @@ function broadcast(roomId, data) {
   if (rooms[roomId]) {
     rooms[roomId].clients.forEach((client) => {
       if (client.readyState === 1) {
-        // Verifica che il client sia connesso
-        client.send(JSON.stringify(data)); // Invia il messaggio agli altri client
+        client.send(JSON.stringify(data));
       }
     });
   }

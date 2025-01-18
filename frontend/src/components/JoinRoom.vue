@@ -37,32 +37,36 @@ export default {
             const response = await axios.get(
                 `http://localhost:3000/room-exists/${this.joinRoomId}`
             );
-            if (response.data.exists) {
-                this.showAddUsernameModal = true;
-            } else {
+            if (!response.data.exists) {
                 alert("Room does not exist!");
+                return;
+            } else if (response.data.full) {
+                alert("Room is full!");
+                return;
             }
+
+            this.showAddUsernameModal = true;
         },
-        handleUserJoined({ username, roomDetails }) {
+        handleUserJoined({ username, roomDetails, score, users }) {
             this.username = username;
+            this.score = score;
+            this.users = users;
             this.roomDetails = roomDetails;
             this.isConnected = true;
             this.showAddUsernameModal = false;
         },
     },
     created() {
-        // Ascolta l'evento 'room-details' emesso dal websocket.js
-        window.addEventListener("room-details", (event) => {
-            this.roomDetails.score = event.detail.score;
-            this.roomDetails.users = event.detail.users;
-        });
-
         // Ascolta l'evento 'room-update' emesso dal websocket.js
         window.addEventListener("room-update", (event) => {
             const { users, score, roomId } = event.detail;
             if (roomId === this.joinRoomId) {
                 this.roomDetails = { ...this.roomDetails, users, score };
             }
+        });
+        window.addEventListener("room-full", () => {
+            // TODO: Change this alert with an effective message;
+            alert("Room is full!");
         });
     },
 };

@@ -42,16 +42,20 @@ export default {
                 roomId: this.roomId,
                 username: this.username,
             });
+        },
+    },
+    mounted() {
+        this.connectWebSocket();
+        window.addEventListener("room-details", (event) => {
             this.$emit("user-joined", {
+                score: event.detail.score,
+                users: event.detail.users,
                 username: this.username,
                 roomDetails: {
                     users: [this.username],
                 },
             });
-        },
-    },
-    mounted() {
-        this.connectWebSocket();
+        });
     }
 };
 </script>
