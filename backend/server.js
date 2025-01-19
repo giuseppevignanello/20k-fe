@@ -45,7 +45,7 @@ app.post("/create-room", (req, res) => {
 
 app.get("/room-exists/:roomId", (req, res) => {
   const roomId = req.params.roomId;
-  const room = rooms[roomId];
+  const room = webSocketHandler.rooms[roomId];
 
   if (!room) {
     return res.json({ exists: false });

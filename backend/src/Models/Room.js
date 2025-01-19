@@ -18,14 +18,6 @@ class Room {
     return false;
   }
 
-  startGame() {
-    this.state = "in-game";
-    this.broadcast({
-      type: "game-started",
-      message: "The game has started!",
-    });
-  }
-
   broadcast(message) {
     this.clients.forEach((client) => {
       client.send(JSON.stringify(message));
@@ -33,7 +25,7 @@ class Room {
   }
 
   isFull() {
-    return this.users.length === this.players;
+    return this.users.length == this.players;
   }
 
   nextTurn() {

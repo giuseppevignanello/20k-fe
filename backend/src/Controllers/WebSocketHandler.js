@@ -1,6 +1,5 @@
-const Room = require("../Models/Room");
 const Player = require("../Models/Player");
-const Game = require("../Models/Game");
+const GameController = require("./GameController");
 
 class WebSocketHandler {
   constructor(wss) {
@@ -54,8 +53,8 @@ class WebSocketHandler {
       room.updateRoom();
 
       if (room.isFull()) {
-        const game = new Game(room);
-        game.start();
+        const gameController = new GameController(room);
+        gameController.start();
       }
     } else {
       socket.send(

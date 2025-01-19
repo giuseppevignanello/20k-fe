@@ -1,8 +1,9 @@
 <template>
     <div>
-        <input v-model="joinRoomId" placeholder="Enter Room ID" />
-        <button @click="joinRoom">Join Room</button>
-
+        <div v-if="!isConnected">
+            <input v-model="joinRoomId" placeholder="Enter Room ID" />
+            <button @click="joinRoom">Join Room</button>
+        </div>
         <!-- room details -->
         <div v-if="isConnected" class="room-details">
             <span><strong>Points:</strong> {{ roomDetails.score }}</span>
@@ -13,6 +14,11 @@
         <UiModal :visible="showAddUsernameModal" @close="showAddUsernameModal = false">
             <AddUserNameModal :room-id="joinRoomId" @user-joined="handleUserJoined" />
         </UiModal>
+
+        <GameRoom v-if="isConnected" :gameDataProp="gameData">
+
+        </GameRoom>
+
     </div>
 </template>
 
@@ -20,9 +26,10 @@
 import axios from "axios";
 import UiModal from "./ui/UiModal.vue";
 import AddUserNameModal from "./AddUserNameModal.vue";
+import GameRoom from "./GameRoom.vue";
 
 export default {
-    components: { UiModal, AddUserNameModal },
+    components: { UiModal, AddUserNameModal, GameRoom },
     data() {
         return {
             joinRoomId: "",
@@ -30,6 +37,14 @@ export default {
             isConnected: false,
             roomDetails: null,
             username: "",
+            gameData: {
+                username: null,
+                score: null,
+                users: null,
+                roomDetails: null,
+                isConnected: null,
+                showAddUsernameModal: null,
+            }
         };
     },
     methods: {
@@ -54,6 +69,15 @@ export default {
             this.roomDetails = roomDetails;
             this.isConnected = true;
             this.showAddUsernameModal = false;
+            this.gameData = {
+                username: username,
+                score: score,
+                users: users,
+                roomId: this.joinRoomId,
+                roomDetails: this.roomDetails,
+                isConnected: this.isConnected,
+                showAddUsernameModal: this.showAddUsernameModal,
+            }
         },
     },
     created() {
