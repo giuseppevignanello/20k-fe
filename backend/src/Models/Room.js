@@ -41,6 +41,19 @@ class Room {
       score: this.score,
     });
   }
+
+  //Check this function
+  reorderUsers(dealer) {
+    const dealerIndex = this.users.findIndex(
+      (user) => user.username === dealer
+    );
+    if (dealerIndex !== -1) {
+      this.users = [
+        ...this.users.slice(dealerIndex),
+        ...this.users.slice(0, dealerIndex),
+      ];
+    }
+  }
 }
 
 module.exports = Room;

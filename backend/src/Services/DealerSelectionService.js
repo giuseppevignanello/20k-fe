@@ -9,8 +9,8 @@ class DealerSelectionService {
   }
   selectFirstDealer() {
     const deck = new Deck();
-    this.randomDeck = deck.getRandomDeck(); // Ottiene un mazzo mescolato
-    this.distributeRandomDeck();
+    this.randomDeck = deck.getRandomDeck();
+    return this.distributeRandomDeck();
   }
 
   distributeRandomDeck() {
@@ -36,7 +36,7 @@ class DealerSelectionService {
       playerIndex = (playerIndex + 1) % players.length;
     }
 
-    this.buildResponse();
+    return this.buildResponse();
   }
 
   buildResponse() {
@@ -47,7 +47,6 @@ class DealerSelectionService {
     };
 
     this.room.broadcast(response);
-    console.log(response);
     return response;
   }
 }

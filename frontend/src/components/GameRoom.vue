@@ -14,6 +14,7 @@
 
 
 <script>
+import { websocket } from "../websocket"
 
 export default {
     props: {
@@ -33,6 +34,18 @@ export default {
         };
     },
     methods: {
+        connectWebSocket() {
+            websocket.connect("ws://localhost:3000");
+        },
+        prueba() {
+            websocket.send(JSON.stringify({
+                type: 'join-room',
+                payload: {
+                    roomId: this.gameData.roomId,
+                    username: this.gameData.username
+                }
+            }));
+        },
         distributeCards() {
             if (!this.dealerDistributionCards.length) return;
 
@@ -64,6 +77,7 @@ export default {
 
     mounted() {
         this.gameData = this.gameDataProp;
+        this.connectWebSocket();
     },
     created() {
         window.addEventListener("dealer-selection", (event) => {
