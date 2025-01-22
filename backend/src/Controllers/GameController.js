@@ -6,30 +6,21 @@ class GameController {
   }
 
   start() {
-    this.room.broadcast({
-      type: "game-started",
-      message: "The game has started!",
-    });
     const preGamePhaseController = new PreGamePhaseController(this.room);
-    preGamePhaseController.startDealerPhase();
-    this.startTurn();
-    this.distributeCards();
-  }
+    const dealerResponse = preGamePhaseController.startDealerPhase();
+    const firstThreeCardsDistribution =
+      preGamePhaseController.firstThreeCardsDistribution();
 
-  distributeCards() {}
+    this.room.broadcast(dealerResponse);
 
-  startTurn() {
-    const player = this.room.users[this.room.currentTurn];
-    this.sendTurnMessage(player);
-  }
+    this.room.users.forEach((user, index) => {
+      const playerCards = {
+        type: "initial-cards",
+        cards: firstThreeCardsDistribution[index],
+      };
 
-  sendTurnMessage(player) {
-    player.socket.send(
-      JSON.stringify({
-        type: "your-turn",
-        message: `${player.username}'s turn`,
-      })
-    );
+      user.socket.send(JSON.stringify(playerCards));
+    });
   }
 }
 

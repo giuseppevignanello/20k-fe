@@ -45,8 +45,6 @@ class DealerSelectionService {
       distributedCards: this.distributedCards,
       tenOfDenariPlayer: this.tenOfDenariPlayer,
     };
-
-    this.room.broadcast(response);
     return response;
   }
 }

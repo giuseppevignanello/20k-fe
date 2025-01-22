@@ -15,6 +15,7 @@
 
 
 <script>
+import { ref, reactive, computed } from 'vue';
 import { websocket } from "../websocket"
 import UserSlot from "./UserSlot.vue";
 
@@ -25,52 +26,63 @@ export default {
             type: Object,
             required: true,
         },
+    },
+    setup() {
+        const dealerDistributionCards = ref(null);
+        const selectedDealer = ref(null);
+        const gameData = reactive({
+            users: [],
+            dealer: null,
+        });
+        const isDistributionComplete = ref(false);
 
-    },
-    data() {
-        return {
-            dealerDistributionCards: null,
-            selectedDealer: null,
-            gameData: {
-                users: [],
-            },
-            isDistributionComplete: false,
-        };
-    },
-    methods: {
-        connectWebSocket() {
+        const orderedUsers = computed(() =>
+            calculateVisualOrder(gameData.users, gameData.username)
+        );
+
+        function connectWebSocket() {
             websocket.connect("ws://localhost:3000");
-        },
-        distributeCards() {
-            if (!this.dealerDistributionCards.length) return;
+        }
 
-            this.gameData.users.forEach((user) => {
+        function distributeDealerSelectionCards() {
+            if (!dealerDistributionCards.value.length) return;
+
+            gameData.users.forEach((user) => {
                 if (!user.cards) user.cards = [];
                 user.visibleCards = [];
             });
 
             let userIndex = 0;
             const distributeNextCard = (index) => {
-                if (index >= this.dealerDistributionCards.length) {
-                    this.dealerDistributionCards = [];
-                    this.isDistributionComplete = true;
+                if (index >= dealerDistributionCards.value.length) {
+                    dealerDistributionCards.value = [];
+                    isDistributionComplete.value = true;
+                    setTimeout(() => distributeFirstThreeCards(), 2000);
                     return;
                 }
 
-                const card = this.dealerDistributionCards[index];
-                this.gameData.users[userIndex].cards.push(card);
-                this.gameData.users[userIndex].visibleCards.push(card);
+                const card = dealerDistributionCards.value[index];
+                gameData.users[userIndex].cards.push(card);
+                gameData.users[userIndex].visibleCards.push(card);
 
-                userIndex = (userIndex + 1) % this.gameData.users.length;
+                userIndex = (userIndex + 1) % gameData.users.length;
 
                 setTimeout(() => distributeNextCard(index + 1), 300);
             };
 
             distributeNextCard(0);
-            this.gameData.dealer = this.selectedDealer;
-        },
+            gameData.dealer = selectedDealer.value;
+        }
 
-        calculateVisualOrder(users, currentUsername) {
+        function distributeFirstThreeCards() {
+            gameData.users.forEach((user) => {
+                user.visibleCards = [];
+            });
+
+
+        }
+
+        function calculateVisualOrder(users, currentUsername) {
             if (!users || !currentUsername) return users;
 
             const currentUserIndex = users.findIndex(user => user.username === currentUsername);
@@ -82,18 +94,30 @@ export default {
             ];
         }
 
+        return {
+            dealerDistributionCards,
+            selectedDealer,
+            gameData,
+            isDistributionComplete,
+            orderedUsers,
+            connectWebSocket,
+            distributeDealerSelectionCards,
+            distributeFirstThreeCards,
+            calculateVisualOrder,
+        };
     },
-
     mounted() {
-        this.gameData = this.gameDataProp;
+        Object.assign(this.gameData, this.gameDataProp);
         this.connectWebSocket();
     },
     created() {
         window.addEventListener("dealer-selection", (event) => {
-            console.log(event);
             this.dealerDistributionCards = event.detail.distributedCards;
             this.selectedDealer = event.detail.tenOfDenariPlayer;
-            this.distributeCards();
+            this.distributeDealerSelectionCards();
+        })
+        window.addEventListener("initial-cards", (event) => {
+            console.log(event.cards);
         })
         window.addEventListener("room-update", (event) => {
             const { roomId, users } = event.detail;
@@ -108,6 +132,7 @@ export default {
     },
 };
 </script>
+
 
 
 <style scoped>

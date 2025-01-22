@@ -9,14 +9,12 @@
                 <img :src="`/cards/${card.value + card.suit}.png`" :alt="`${card.value} ${card.suit}`" width="80px"
                     height="100px" />
             </li>
-
         </ul>
     </div>
 </template>
 
 
 <script>
-
 
 export default {
     props: {

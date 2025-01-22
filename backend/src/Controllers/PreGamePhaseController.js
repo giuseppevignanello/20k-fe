@@ -7,9 +7,11 @@ class PreGamePhaseController {
 
   startDealerPhase() {
     const dealerSelectionService = new DealerSelectionService(this.room);
-    const dealerSelection = dealerSelectionService.selectFirstDealer();
-    const dealer = dealerSelection.tenOfDenariPlayer;
-    this.room.reorderUsers(dealer);
+    return dealerSelectionService.selectFirstDealer();
+  }
+
+  firstThreeCardsDistribution() {
+    return ["AA", "BB", "CC", "DD"];
   }
 }
 
