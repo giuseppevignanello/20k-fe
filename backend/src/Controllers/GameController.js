@@ -16,7 +16,7 @@ class GameController {
     this.room.users.forEach((user, index) => {
       const playerCards = {
         type: "initial-cards",
-        cards: firstThreeCardsDistribution[index],
+        cards: firstThreeCardsDistribution[user.username],
       };
 
       user.socket.send(JSON.stringify(playerCards));

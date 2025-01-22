@@ -28,6 +28,7 @@ export default {
         },
     },
     setup() {
+        const userFirstThreeCards = [];
         const dealerDistributionCards = ref(null);
         const selectedDealer = ref(null);
         const gameData = reactive({
@@ -104,6 +105,7 @@ export default {
             distributeDealerSelectionCards,
             distributeFirstThreeCards,
             calculateVisualOrder,
+            userFirstThreeCards,
         };
     },
     mounted() {
@@ -117,7 +119,8 @@ export default {
             this.distributeDealerSelectionCards();
         })
         window.addEventListener("initial-cards", (event) => {
-            console.log(event.cards);
+            this.userFirstThreeCards = event.detail.cards;
+            console.log(event);
         })
         window.addEventListener("room-update", (event) => {
             const { roomId, users } = event.detail;
