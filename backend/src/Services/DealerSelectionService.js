@@ -14,7 +14,7 @@ class DealerSelectionService {
   }
 
   distributeRandomDeck() {
-    const players = this.room.players;
+    const users = this.room.users;
     let playerIndex = 0;
 
     while (true) {
@@ -24,7 +24,7 @@ class DealerSelectionService {
 
       const card = this.randomDeck.shift();
 
-      const currentPlayer = players[playerIndex];
+      const currentPlayer = users[playerIndex];
 
       this.distributedCards.push(card);
 
@@ -33,7 +33,7 @@ class DealerSelectionService {
         break;
       }
 
-      playerIndex = (playerIndex + 1) % players.length;
+      playerIndex = (playerIndex + 1) % users.length;
     }
 
     return this.buildResponse();
