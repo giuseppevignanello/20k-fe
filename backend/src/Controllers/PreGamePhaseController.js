@@ -13,13 +13,17 @@ class PreGamePhaseController {
   }
 
   firstThreeCardsDistribution() {
-    const deck = this.deckModel.getRandomDeck();
+    this.room.currentDeck = this.deckModel.getRandomDeck();
     const firstThreeCards = [];
     this.room.users.forEach((user) => {
-      const cards = deck.splice(0, 3);
+      const cards = this.room.currentDeck.splice(0, 3);
       firstThreeCards[user.username] = cards;
     });
-    return firstThreeCards;
+    const response = {
+      remainingDeck: this.room.currentDeck,
+      firstThreeCards: firstThreeCards,
+    };
+    return response;
   }
 }
 

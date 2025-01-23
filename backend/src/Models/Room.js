@@ -7,6 +7,7 @@ class Room {
     this.clients = new Set();
     this.state = "waiting";
     this.currentTurn = 0;
+    this.currentDeck = [];
   }
 
   addPlayer(player) {

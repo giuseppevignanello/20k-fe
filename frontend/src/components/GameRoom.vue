@@ -2,13 +2,16 @@
     <div class="game-table">
         <div v-if="gameData && gameData.users" class="players-circle">
             <UserSlot v-for="(user, index) in calculateVisualOrder(gameData.users, gameData.username)" :key="index"
-                :user="user" class="user-card" :class="[
-                    'position-' + index,
-                    { 'current-player': user.username === username }]">
+                :user="user" :currentUsername="gameData.username" class="user-card" :class="[
+                    'position-' + index]">
             </UserSlot>
             <div v-if="isDistributionComplete">
                 Il dealer è {{ gameData.dealer.username }}
             </div>
+            <!-- <UiModal :visible="suitSelectionPhase" @close="suitSelectionPhase = false">
+                <h1>Prueba</h1>
+            </UiModal> -->
+
         </div>
     </div>
 </template>
@@ -28,7 +31,7 @@ export default {
         },
     },
     setup() {
-        const userFirstThreeCards = [];
+        const userFirstThreeCards = ref([]);
         const dealerDistributionCards = ref(null);
         const selectedDealer = ref(null);
         const gameData = reactive({
@@ -36,6 +39,7 @@ export default {
             dealer: null,
         });
         const isDistributionComplete = ref(false);
+        const suitSelectionPhase = ref(false);
 
         const orderedUsers = computed(() =>
             calculateVisualOrder(gameData.users, gameData.username)
@@ -50,7 +54,7 @@ export default {
 
             gameData.users.forEach((user) => {
                 if (!user.cards) user.cards = [];
-                user.visibleCards = [];
+                user.dealerDistributionVisibleCards = [];
             });
 
             let userIndex = 0;
@@ -58,13 +62,16 @@ export default {
                 if (index >= dealerDistributionCards.value.length) {
                     dealerDistributionCards.value = [];
                     isDistributionComplete.value = true;
-                    setTimeout(() => distributeFirstThreeCards(), 2000);
+                    setTimeout(() => {
+                        distributeFirstThreeCards();
+                        suitSelectionPhase.value = true;
+                    }, 2000);
                     return;
                 }
 
                 const card = dealerDistributionCards.value[index];
                 gameData.users[userIndex].cards.push(card);
-                gameData.users[userIndex].visibleCards.push(card);
+                gameData.users[userIndex].dealerDistributionVisibleCards.push(card);
 
                 userIndex = (userIndex + 1) % gameData.users.length;
 
@@ -77,10 +84,9 @@ export default {
 
         function distributeFirstThreeCards() {
             gameData.users.forEach((user) => {
-                user.visibleCards = [];
+                user.dealerDistributionVisibleCards = [];
+                user.userCards = userFirstThreeCards.value.value;
             });
-
-
         }
 
         function calculateVisualOrder(users, currentUsername) {
@@ -106,6 +112,7 @@ export default {
             distributeFirstThreeCards,
             calculateVisualOrder,
             userFirstThreeCards,
+            suitSelectionPhase
         };
     },
     mounted() {
@@ -119,8 +126,7 @@ export default {
             this.distributeDealerSelectionCards();
         })
         window.addEventListener("initial-cards", (event) => {
-            this.userFirstThreeCards = event.detail.cards;
-            console.log(event);
+            this.userFirstThreeCards.value = event.detail.cards;
         })
         window.addEventListener("room-update", (event) => {
             const { roomId, users } = event.detail;
@@ -153,29 +159,31 @@ export default {
 
 .user-card {
     position: absolute;
+    width: 300px;
+    height: 150px;
     transform-origin: center;
 }
 
 /* Positions for 5 players */
 .user-card.position-0 {
-    bottom: 10%;
+    bottom: 25%;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .user-card.position-1 {
-    bottom: 30%;
+    bottom: 50%;
     right: 10%;
 }
 
 .user-card.position-2 {
     top: 0%;
-    right: 35%;
+    right: 45%;
 }
 
 .user-card.position-3 {
     top: 20%;
-    left: 20%;
+    left: 5%;
 }
 
 .user-card.position-4 {

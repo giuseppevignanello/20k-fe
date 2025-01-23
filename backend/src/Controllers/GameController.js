@@ -8,9 +8,11 @@ class GameController {
   start() {
     const preGamePhaseController = new PreGamePhaseController(this.room);
     const dealerResponse = preGamePhaseController.startDealerPhase();
-    const firstThreeCardsDistribution =
+    const firstThreeCardsDistributionResponse =
       preGamePhaseController.firstThreeCardsDistribution();
-
+    const firstThreeCardsDistribution =
+      firstThreeCardsDistributionResponse.firstThreeCards;
+    this.room.remainingDeck = firstThreeCardsDistributionResponse.remainingDeck;
     this.room.broadcast(dealerResponse);
 
     this.room.users.forEach((user, index) => {
