@@ -23,9 +23,8 @@
                 </ul>
             </div>
             <div v-else>
-                <!-- TODO: change with a dynamic information -->
                 <ul class="flex gap-2">
-                    <li class="list-unstyled" v-for="(index) in 3" :key="index">
+                    <li class="list-unstyled" v-for="(index) in getBackCardCounter()" :key="index">
                         <img :src="`/back-card.jpg`" :alt="back - card" width="80px" height="100px" />
                     </li>
                 </ul>
@@ -46,19 +45,31 @@ export default {
         currentUsername: {
             type: String,
             required: true,
+        },
+        status: {
+            type: String,
+            required: true,
         }
     },
     data() {
         return {
-
         };
     },
     methods: {
+        getBackCardCounter() {
+            console.log(this.status);
+            if (this.status == 'three-card-distributed') {
+                return 3;
+            } else if (this.status == 'two-card-distributed') {
+                return 5;
+            }
+        }
     },
     computed: {
         isCurrentUser() {
             return this.user.username === this.currentUsername;
         }
+
     }
 };
 </script>

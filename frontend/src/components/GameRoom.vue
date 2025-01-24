@@ -2,8 +2,9 @@
     <div class="game-table">
         <div v-if="gameData && gameData.users" class="players-circle">
             <div v-for="(user, index) in calculateVisualOrder(gameData.users, gameData.username)" :key="index">
-                <UserSlot :user="user" :currentUsername="gameData.username" class="user-card" :class="[
-                    'position-' + index]">
+                <UserSlot :status="gameData.status" :user="user" :currentUsername="gameData.username" class="user-card"
+                    :class="[
+                        'position-' + index]">
                 </UserSlot>
                 <UiModal :visible="showSuitSelectionModal()" :hasClose="false" @close="suitSelectionPhase = false">
                     <SuitSelectionModal :userCards="user.userCards" @suit-selected="handleSuitSelection" />
@@ -46,6 +47,7 @@ export default {
                 'username': null,
             },
             suit: null,
+            status: 'pre-game',
         });
         const isDistributionComplete = ref(false);
         const suitSelectionPhase = ref(false);
@@ -96,17 +98,27 @@ export default {
                 user.dealerDistributionVisibleCards = [];
                 user.userCards = userFirstThreeCards.value.value;
             });
+            gameData.status = "three-card-distributed"
         }
 
         function distributeTwoCards() {
             gameData.users.forEach((user) => {
                 user.userCards = user.userCards.concat(userTwoCards.value.value);
             })
+            gameData.status = "two-card-distributed"
+
         }
 
         function showSuitSelectionModal() {
-            return suitSelectionPhase.value && gameData.username == gameData.dealer.username;
+            const dealerIndex = gameData.users.findIndex(user => user.username === gameData.dealer.username);
+
+            const firstToTalkIndex = (dealerIndex + 1) % gameData.users.length;
+
+            const firstToTalk = gameData.users[firstToTalkIndex];
+
+            return suitSelectionPhase.value && gameData.username === firstToTalk.username;
         }
+
 
         function handleSuitSelection(suit) {
             suitSelectionPhase.value = false;
