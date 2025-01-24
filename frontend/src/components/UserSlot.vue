@@ -65,18 +65,6 @@ export default {
 
 
 <style scoped>
-.flex {
-    display: flex;
-}
-
-.gap-2 {
-    gap: 10px;
-}
-
-.list-unstyled {
-    list-style-type: none;
-}
-
 .user-card p {
     margin: 5px 0;
 }

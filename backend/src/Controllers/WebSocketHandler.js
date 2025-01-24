@@ -5,6 +5,7 @@ class WebSocketHandler {
   constructor(wss) {
     this.wss = wss;
     this.rooms = {};
+    this.gameControllers = {};
   }
 
   handleConnection(socket) {
@@ -18,6 +19,9 @@ class WebSocketHandler {
     switch (message.type) {
       case "join-room":
         this.joinRoom(socket, message);
+        break;
+      case "suit-selected":
+        this.handleSuitSelection(message);
         break;
       default:
         break;
@@ -54,6 +58,7 @@ class WebSocketHandler {
 
       if (room.isFull()) {
         const gameController = new GameController(room);
+        this.gameControllers[roomId] = gameController;
         gameController.start();
       }
     } else {
@@ -61,6 +66,20 @@ class WebSocketHandler {
         JSON.stringify({ type: "room-full", message: "Room is full" })
       );
       socket.close();
+    }
+  }
+
+  handleSuitSelection(message) {
+    const { roomId, suit } = message;
+    const room = this.rooms[roomId];
+    room.broadcast({
+      type: "suit-selected",
+      roomId: roomId,
+      suit: suit,
+    });
+    const gameController = this.gameControllers[roomId];
+    if (gameController) {
+      gameController.distributeTwoCards();
     }
   }
 }

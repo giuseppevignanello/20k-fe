@@ -1,17 +1,20 @@
 <template>
     <div class="game-table">
         <div v-if="gameData && gameData.users" class="players-circle">
-            <UserSlot v-for="(user, index) in calculateVisualOrder(gameData.users, gameData.username)" :key="index"
-                :user="user" :currentUsername="gameData.username" class="user-card" :class="[
+            <div v-for="(user, index) in calculateVisualOrder(gameData.users, gameData.username)" :key="index">
+                <UserSlot :user="user" :currentUsername="gameData.username" class="user-card" :class="[
                     'position-' + index]">
-            </UserSlot>
+                </UserSlot>
+                <UiModal :visible="showSuitSelectionModal()" :hasClose="false" @close="suitSelectionPhase = false">
+                    <SuitSelectionModal :userCards="user.userCards" @suit-selected="handleSuitSelection" />
+                </UiModal>
+            </div>
             <div v-if="isDistributionComplete">
                 Il dealer è {{ gameData.dealer.username }}
             </div>
-            <!-- <UiModal :visible="suitSelectionPhase" @close="suitSelectionPhase = false">
-                <h1>Prueba</h1>
-            </UiModal> -->
-
+            <div v-if="gameData.suit">
+                La briscola è {{ gameData.suit }}
+            </div>
         </div>
     </div>
 </template>
@@ -21,9 +24,11 @@
 import { ref, reactive, computed } from 'vue';
 import { websocket } from "../websocket"
 import UserSlot from "./UserSlot.vue";
+import UiModal from "./ui/UiModal.vue"
+import SuitSelectionModal from "./SuitSelectionModal.vue";
 
 export default {
-    components: { UserSlot },
+    components: { UserSlot, UiModal, SuitSelectionModal },
     props: {
         gameDataProp: {
             type: Object,
@@ -32,11 +37,15 @@ export default {
     },
     setup() {
         const userFirstThreeCards = ref([]);
+        const userTwoCards = ref([]);
         const dealerDistributionCards = ref(null);
         const selectedDealer = ref(null);
         const gameData = reactive({
             users: [],
-            dealer: null,
+            dealer: {
+                'username': null,
+            },
+            suit: null,
         });
         const isDistributionComplete = ref(false);
         const suitSelectionPhase = ref(false);
@@ -89,6 +98,26 @@ export default {
             });
         }
 
+        function distributeTwoCards() {
+            gameData.users.forEach((user) => {
+                user.userCards = user.userCards.concat(userTwoCards.value.value);
+            })
+        }
+
+        function showSuitSelectionModal() {
+            return suitSelectionPhase.value && gameData.username == gameData.dealer.username;
+        }
+
+        function handleSuitSelection(suit) {
+            suitSelectionPhase.value = false;
+            console.log(gameData);
+            websocket.sendMessage({
+                type: "suit-selected",
+                roomId: gameData.roomId,
+                suit: suit.selectedSuit,
+            });
+        }
+
         function calculateVisualOrder(users, currentUsername) {
             if (!users || !currentUsername) return users;
 
@@ -110,9 +139,12 @@ export default {
             connectWebSocket,
             distributeDealerSelectionCards,
             distributeFirstThreeCards,
+            distributeTwoCards,
             calculateVisualOrder,
             userFirstThreeCards,
-            suitSelectionPhase
+            userTwoCards,
+            showSuitSelectionModal,
+            handleSuitSelection
         };
     },
     mounted() {
@@ -128,6 +160,10 @@ export default {
         window.addEventListener("initial-cards", (event) => {
             this.userFirstThreeCards.value = event.detail.cards;
         })
+        window.addEventListener('two-cards', (event) => {
+            this.userTwoCards.value = event.detail.cards;
+            this.distributeTwoCards();
+        })
         window.addEventListener("room-update", (event) => {
             const { roomId, users } = event.detail;
             if (roomId === this.gameData.roomId) {
@@ -136,6 +172,12 @@ export default {
                     cards: [],
                     score: 0
                 }));
+            }
+        });
+        window.addEventListener("suit-selected", (event) => {
+            const { roomId, suit } = event.detail;
+            if (roomId === this.gameData.roomId) {
+                this.gameData.suit = suit;
             }
         });
     },

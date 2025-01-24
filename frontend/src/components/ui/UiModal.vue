@@ -1,7 +1,7 @@
 <template>
     <div v-show="visible" class="modal-overlay" @click.self="close">
         <div class="modal-content">
-            <button class="modal-close" @click="close">✖</button>
+            <button v-if="hasClose" class="modal-close" @click="close">✖</button>
             <slot></slot>
         </div>
     </div>
@@ -13,6 +13,10 @@ export default {
         visible: {
             type: Boolean,
             required: true,
+        },
+        hasClose: {
+            type: Boolean,
+            default: true,
         },
     },
     methods: {

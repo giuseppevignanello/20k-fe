@@ -25,6 +25,19 @@ class PreGamePhaseController {
     };
     return response;
   }
+
+  twoCardsDistribution() {
+    const twoCardsDistribution = [];
+    this.room.users.forEach((user) => {
+      const cards = this.room.currentDeck.splice(0, 2);
+      twoCardsDistribution[user.username] = cards;
+    });
+    const response = {
+      remainingDeck: this.room.currentDeck,
+      twoCardsDistribution: twoCardsDistribution,
+    };
+    return response;
+  }
 }
 
 module.exports = PreGamePhaseController;
