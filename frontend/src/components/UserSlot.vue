@@ -1,6 +1,10 @@
 <template>
     <div>
         <p> <strong> {{ user.username }} </strong></p>
+        <div v-if="userOnTurn.user.username == user.username">
+            è il tuo turno
+        </div>
+
         <div v-if="user.dealerDistributionVisibleCards">
             <ul class="flex gap-2 dealer-cards-ul">
                 <li class="list-unstyled dealer-cards-li" v-for="(card, index) in user.dealerDistributionVisibleCards"
@@ -25,7 +29,7 @@
             <div v-else>
                 <ul class="flex gap-2">
                     <li class="list-unstyled" v-for="(index) in getBackCardCounter()" :key="index">
-                        <img :src="`/back-card.jpg`" :alt="back - card" width="80px" height="100px" />
+                        <img :src="`/back-card.jpg`" alt="back-card" width="80px" height="100px" />
                     </li>
                 </ul>
             </div>
@@ -49,7 +53,11 @@ export default {
         status: {
             type: String,
             required: true,
-        }
+        },
+        userOnTurn: {
+            type: Object,
+            required: true,
+        },
     },
     data() {
         return {
@@ -57,7 +65,6 @@ export default {
     },
     methods: {
         getBackCardCounter() {
-            console.log(this.status);
             if (this.status == 'three-card-distributed') {
                 return 3;
             } else if (this.status == 'two-card-distributed') {

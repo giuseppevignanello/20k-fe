@@ -2,12 +2,13 @@
     <div class="game-table">
         <div v-if="gameData && gameData.users" class="players-circle">
             <div v-for="(user, index) in calculateVisualOrder(gameData.users, gameData.username)" :key="index">
-                <UserSlot :status="gameData.status" :user="user" :currentUsername="gameData.username" class="user-card"
-                    :class="[
+                <UserSlot :userOnTurn="getUserOnTurn()" :status="gameData.status" :user="user"
+                    :currentUsername="gameData.username" class="user-card" :class="[
                         'position-' + index]">
                 </UserSlot>
-                <UiModal :visible="showSuitSelectionModal()" :hasClose="false" @close="suitSelectionPhase = false">
-                    <SuitSelectionModal :userCards="user.userCards" @suit-selected="handleSuitSelection" />
+                <UiModal v-if="user.userCards" :visible="showSuitSelectionModal()" :hasClose="false"
+                    @close="suitSelectionPhase = false">
+                    <SuitSelectionModal :userCards="user.userCards" />
                 </UiModal>
             </div>
             <div v-if="isDistributionComplete">
@@ -41,6 +42,7 @@ export default {
         const userTwoCards = ref([]);
         const dealerDistributionCards = ref(null);
         const selectedDealer = ref(null);
+        let userOnTurn = reactive({ index: null, user: [] });
         const gameData = reactive({
             users: [],
             dealer: {
@@ -101,6 +103,7 @@ export default {
             gameData.status = "three-card-distributed"
         }
 
+        // TODO: call this function only when userCards is populated to avoid concat error
         function distributeTwoCards() {
             gameData.users.forEach((user) => {
                 user.userCards = user.userCards.concat(userTwoCards.value.value);
@@ -116,18 +119,33 @@ export default {
 
             const firstToTalk = gameData.users[firstToTalkIndex];
 
+            Object.assign(userOnTurn, {
+                index: firstToTalkIndex,
+                user: firstToTalk
+            });
+
             return suitSelectionPhase.value && gameData.username === firstToTalk.username;
         }
 
 
-        function handleSuitSelection(suit) {
+        function handleSuitSelection(event) {
+            const suit = event.selectedSuit;
             suitSelectionPhase.value = false;
-            console.log(gameData);
             websocket.sendMessage({
                 type: "suit-selected",
                 roomId: gameData.roomId,
-                suit: suit.selectedSuit,
+                suit: suit,
             });
+
+            console.log("Prev User On Turn")
+            console.log(userOnTurn)
+            const newIndex = (userOnTurn.index + 1) % gameData.users.length;
+            userOnTurn.index = newIndex;
+            userOnTurn.user = gameData.users[newIndex];
+
+            console.log("New User On Turn")
+            console.log(userOnTurn)
+
         }
 
         function calculateVisualOrder(users, currentUsername) {
@@ -141,6 +159,13 @@ export default {
                 ...users.slice(0, currentUserIndex)
             ];
         }
+
+        function getUserOnTurn() {
+            return (
+                userOnTurn
+            );
+        }
+
 
         return {
             dealerDistributionCards,
@@ -156,7 +181,9 @@ export default {
             userFirstThreeCards,
             userTwoCards,
             showSuitSelectionModal,
-            handleSuitSelection
+            handleSuitSelection,
+            userOnTurn,
+            getUserOnTurn
         };
     },
     mounted() {
@@ -192,6 +219,9 @@ export default {
                 this.gameData.suit = suit;
             }
         });
+        this.emitter.on('suit-selected', (suit) => {
+            this.handleSuitSelection(suit);
+        })
     },
 };
 </script>

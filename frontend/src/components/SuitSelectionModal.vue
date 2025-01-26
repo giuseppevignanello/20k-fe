@@ -41,7 +41,7 @@ export default {
 
     methods: {
         suitSelection(suit) {
-            this.$emit("suit-selected", {
+            this.emitter.emit("suit-selected", {
                 selectedSuit: suit,
             });
         },

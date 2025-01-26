@@ -24,6 +24,11 @@ export default {
             this.$emit("close");
         },
     },
+    computed: {
+        listeners() {
+            return { ...this.$attrs };
+        },
+    },
 };
 </script>
 
