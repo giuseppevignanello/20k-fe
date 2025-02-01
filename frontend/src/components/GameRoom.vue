@@ -10,6 +10,12 @@
                     @close="suitSelectionPhase = false">
                     <SuitSelectionModal :userCards="user.userCards" />
                 </UiModal>
+                {{ user.username }}
+                {{ index }}
+                <UiModal v-if="showPlayingDecisionPhaseModal()" :visible="showPlayingDecisionPhaseModal()"
+                    :hasClose="false">
+                    <PlayingDecisionPhaseModal :user="user" :userCards="user.userCards" />
+                </UiModal>
             </div>
             <div v-if="isDistributionComplete">
                 Il dealer è {{ gameData.dealer.username }}
@@ -28,9 +34,10 @@ import { websocket } from "../websocket"
 import UserSlot from "./UserSlot.vue";
 import UiModal from "./ui/UiModal.vue"
 import SuitSelectionModal from "./SuitSelectionModal.vue";
+import PlayingDecisionPhaseModal from "./PlayingDecisionPhaseModal.vue"
 
 export default {
-    components: { UserSlot, UiModal, SuitSelectionModal },
+    components: { UserSlot, UiModal, SuitSelectionModal, PlayingDecisionPhaseModal },
     props: {
         gameDataProp: {
             type: Object,
@@ -43,6 +50,7 @@ export default {
         const dealerDistributionCards = ref(null);
         const selectedDealer = ref(null);
         let userOnTurn = reactive({ index: null, user: [] });
+        const dealerIndex = ref(null);
         const gameData = reactive({
             users: [],
             dealer: {
@@ -53,6 +61,7 @@ export default {
         });
         const isDistributionComplete = ref(false);
         const suitSelectionPhase = ref(false);
+        const playingDecisionPhase = ref(false);
 
         const orderedUsers = computed(() =>
             calculateVisualOrder(gameData.users, gameData.username)
@@ -115,9 +124,9 @@ export default {
         }
 
         function startSuitSelectionPhase() {
-            const dealerIndex = gameData.users.findIndex(user => user.username === gameData.dealer.username);
+            dealerIndex.value = gameData.users.findIndex(user => user.username === gameData.dealer.username);
 
-            const firstToTalkIndex = (dealerIndex + 1) % gameData.users.length;
+            const firstToTalkIndex = (dealerIndex.value + 1) % gameData.users.length;
 
             const firstToTalk = gameData.users[firstToTalkIndex];
 
@@ -129,6 +138,10 @@ export default {
 
         function showSuitSelectionModal() {
             return suitSelectionPhase.value && gameData.username === userOnTurn.user.username;
+        }
+
+        function showPlayingDecisionPhaseModal() {
+            return playingDecisionPhase.value && gameData.username === userOnTurn.user.username;
         }
 
 
@@ -143,14 +156,18 @@ export default {
                 userOnTurnIndex: userOnTurn.index,
             });
 
+        }
 
-            // const newIndex = (userOnTurn.index + 1) % gameData.users.length;
-
-            // const newUser = gameData.users[newIndex];
-            // userOnTurn.index = newIndex;
-            // Object.assign(userOnTurn.user, newUser);
-            // console.log("End Users");
-            // console.log(gameData.users);
+        function handlePlayingDecision(event) {
+            const playingDecision = event.playingDecision;
+            const user = event.user;
+            websocket.sendMessage({
+                type: "playing-decision",
+                roomId: gameData.roomId,
+                playingDecision: playingDecision,
+                user: user,
+                userOnTurnIndex: userOnTurn.index,
+            });
 
         }
 
@@ -172,13 +189,36 @@ export default {
             );
         }
 
+        function getFirstUserAfterSuitSelection(userOnTurnIndex) {
+            const newUserOnTurn = this.gameData.users[userOnTurnIndex];
+            Object.assign(this.userOnTurn, {
+                index: userOnTurnIndex,
+                user: newUserOnTurn
+            });
+            playingDecisionPhase.value = true;
+        }
+
+        function changeUserDecisionTurn(userOnTurnIndex) {
+            Object.assign(userOnTurn, {
+                index: userOnTurnIndex,
+                user: gameData.users[userOnTurnIndex]
+            });
+        }
+
+        function startGame() {
+            alert("Game started!");
+        }
+
 
         return {
+            dealerIndex,
             dealerDistributionCards,
             selectedDealer,
             gameData,
             isDistributionComplete,
             orderedUsers,
+            suitSelectionPhase,
+            playingDecisionPhase,
             connectWebSocket,
             distributeDealerSelectionCards,
             distributeFirstThreeCards,
@@ -190,7 +230,13 @@ export default {
             handleSuitSelection,
             userOnTurn,
             getUserOnTurn,
-            showSuitSelectionModal
+            showSuitSelectionModal,
+            showPlayingDecisionPhaseModal,
+            getFirstUserAfterSuitSelection,
+            handlePlayingDecision,
+            changeUserDecisionTurn,
+            startGame
+
         };
     },
     mounted() {
@@ -225,14 +271,24 @@ export default {
             if (roomId === this.gameData.roomId) {
                 this.gameData.suit = suit;
             }
-            const newUserOnTurn = this.gameData.users[userOnTurnIndex];
-            Object.assign(this.userOnTurn, {
-                index: userOnTurnIndex,
-                user: newUserOnTurn
-            });
+            this.getFirstUserAfterSuitSelection(userOnTurnIndex);
+
+        });
+        window.addEventListener("playing-decision", (event) => {
+            const { roomId, playingDecision, user, userOnTurnIndex } = event.detail;
+            if (roomId === this.gameData.roomId) {
+                if (userOnTurnIndex === this.dealerIndex) {
+                    this.startGame();
+                } else {
+                    this.changeUserDecisionTurn(userOnTurnIndex);
+                }
+            }
         });
         this.emitter.on('suit-selected', (suit) => {
             this.handleSuitSelection(suit);
+        })
+        this.emitter.on('playing-decision', (decision) => {
+            this.handlePlayingDecision(decision);
         })
     },
 };

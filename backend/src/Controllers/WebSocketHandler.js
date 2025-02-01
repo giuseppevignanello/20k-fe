@@ -23,6 +23,8 @@ class WebSocketHandler {
       case "suit-selected":
         this.handleSuitSelection(message);
         break;
+      case "playing-decision":
+        this.handlePlayingDecision(message);
       default:
         break;
     }
@@ -84,6 +86,24 @@ class WebSocketHandler {
     if (gameController) {
       gameController.distributeTwoCards();
     }
+  }
+
+  handlePlayingDecision(message) {
+    const { roomId, user, playingDecision } = message;
+    const room = this.rooms[roomId];
+    const actualUserOnTurnIndex = message.userOnTurnIndex;
+    const newUserOnTurnIndex = actualUserOnTurnIndex + 1;
+    console.log("newUserOnTurnIndex", newUserOnTurnIndex);
+    console.log("actualUserOnTurnIndex", actualUserOnTurnIndex);
+    console.log(user, user);
+
+    room.broadcast({
+      type: "playing-decision",
+      roomId: roomId,
+      user: user,
+      playingDecision: playingDecision,
+      userOnTurnIndex: newUserOnTurnIndex,
+    });
   }
 }
 
