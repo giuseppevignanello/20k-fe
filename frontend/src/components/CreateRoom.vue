@@ -1,6 +1,10 @@
 <template>
     <div>
-        <button @click="showCreateRoomModal = true">Create Room</button>
+        <button
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="button" @click="showCreateRoomModal = true">
+            Create Room
+        </button>
     </div>
     <UiModal :visible="showCreateRoomModal" @close="showCreateRoomModal = false">
         <CreateRoomModal @room-created="setRoomId" />
@@ -8,8 +12,17 @@
     <div v-show="showCreateRoomModal">
 
     </div>
-    <div v-if="roomId != null">
-        Room id = {{ roomId }},
+    <div v-if="roomId != null" class="flex">
+        Room Id
+        <input class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight" type="text"
+            :value="roomId" disabled>
+        <button
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="button" @click="copyURL(roomId)">
+            Copy
+        </button>
+        <div v-if="copied" class="copied p-3 rounded">Copied!</div>
+
     </div>
 
 </template>
@@ -23,6 +36,8 @@ export default {
         return {
             showCreateRoomModal: false,
             roomId: null,
+            copied: false
+
         };
     },
     methods: {
@@ -30,6 +45,17 @@ export default {
             this.roomId = id;
             this.showCreateRoomModal = false;
         },
+        async copyURL(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                this.copied = true;
+                // setTimeout(() => {
+                //     this.copied = false;
+                // }, 3000);
+            } catch ($e) {
+                alert('Cannot copy');
+            }
+        }
     },
 };
 </script>

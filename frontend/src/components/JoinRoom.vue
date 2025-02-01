@@ -1,8 +1,13 @@
 <template>
     <div>
         <div v-if="!isConnected">
-            <input v-model="joinRoomId" placeholder="Enter Room ID" />
-            <button @click="joinRoom">Join Room</button>
+            <input class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight" type="text"
+                v-model="joinRoomId" placeholder="Enter Room ID">
+            <button
+                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="button" @click="joinRoom">
+                Join Room
+            </button>
         </div>
         <!-- room details -->
         <div v-if="isConnected" class="room-details">

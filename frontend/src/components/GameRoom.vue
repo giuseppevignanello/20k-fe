@@ -100,7 +100,9 @@ export default {
                 user.dealerDistributionVisibleCards = [];
                 user.userCards = userFirstThreeCards.value.value;
             });
-            gameData.status = "three-card-distributed"
+            gameData.status = "three-card-distributed";
+            startSuitSelectionPhase();
+
         }
 
         // TODO: call this function only when userCards is populated to avoid concat error
@@ -112,7 +114,7 @@ export default {
 
         }
 
-        function showSuitSelectionModal() {
+        function startSuitSelectionPhase() {
             const dealerIndex = gameData.users.findIndex(user => user.username === gameData.dealer.username);
 
             const firstToTalkIndex = (dealerIndex + 1) % gameData.users.length;
@@ -123,28 +125,32 @@ export default {
                 index: firstToTalkIndex,
                 user: firstToTalk
             });
+        }
 
-            return suitSelectionPhase.value && gameData.username === firstToTalk.username;
+        function showSuitSelectionModal() {
+            return suitSelectionPhase.value && gameData.username === userOnTurn.user.username;
         }
 
 
         function handleSuitSelection(event) {
             const suit = event.selectedSuit;
             suitSelectionPhase.value = false;
+
             websocket.sendMessage({
                 type: "suit-selected",
                 roomId: gameData.roomId,
                 suit: suit,
+                userOnTurnIndex: userOnTurn.index,
             });
 
-            console.log("Prev User On Turn")
-            console.log(userOnTurn)
-            const newIndex = (userOnTurn.index + 1) % gameData.users.length;
-            userOnTurn.index = newIndex;
-            userOnTurn.user = gameData.users[newIndex];
 
-            console.log("New User On Turn")
-            console.log(userOnTurn)
+            // const newIndex = (userOnTurn.index + 1) % gameData.users.length;
+
+            // const newUser = gameData.users[newIndex];
+            // userOnTurn.index = newIndex;
+            // Object.assign(userOnTurn.user, newUser);
+            // console.log("End Users");
+            // console.log(gameData.users);
 
         }
 
@@ -180,10 +186,11 @@ export default {
             calculateVisualOrder,
             userFirstThreeCards,
             userTwoCards,
-            showSuitSelectionModal,
+            startSuitSelectionPhase,
             handleSuitSelection,
             userOnTurn,
-            getUserOnTurn
+            getUserOnTurn,
+            showSuitSelectionModal
         };
     },
     mounted() {
@@ -214,10 +221,15 @@ export default {
             }
         });
         window.addEventListener("suit-selected", (event) => {
-            const { roomId, suit } = event.detail;
+            const { roomId, suit, userOnTurnIndex } = event.detail;
             if (roomId === this.gameData.roomId) {
                 this.gameData.suit = suit;
             }
+            const newUserOnTurn = this.gameData.users[userOnTurnIndex];
+            Object.assign(this.userOnTurn, {
+                index: userOnTurnIndex,
+                user: newUserOnTurn
+            });
         });
         this.emitter.on('suit-selected', (suit) => {
             this.handleSuitSelection(suit);
