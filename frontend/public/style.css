@@ -1,0 +1,75 @@
+/* region variables */
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --text-color: #333;
+  --white-color: white;
+}
+/* endregion variables */
+
+
+/* region colors */
+
+.bg-primary {
+    background-color: var(--primary-color);
+}
+
+.text-primary {
+    color: var(--primary-color);
+}
+
+.bg-secondary {
+    background-color: var(--secondary-color);
+}
+
+.text-secondary {
+    color: var(--secondary-color);
+}
+
+.bg-tertiary {
+    background-color: var(--tertiary-color);
+}
+
+.text-tertiary {
+    color: var(--tertiary-color);
+}
+
+.bg-white {
+    background-color: var(--white-color);
+}
+
+.text-white {
+    color: var(--white-color);
+}
+
+/* endregion colors */
+
+/* region flex */
+.flex  {
+    display: flex;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+/* endregion flex */
+
+/* region border */
+.rounded {
+    border-radius: 8px;
+}
+/* endregion border */
+
+/* region padding  */
+.p-05 {
+    padding: 0.5rem;
+}
+.p-1{
+    padding: 1rem;
+}
+.p-2{
+    padding: 2rem;
+}
+/* endregion padding */
+

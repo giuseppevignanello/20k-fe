@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1>Game Rooms</h1>
+    <div class="flex justify-center">
+        <h1>Game Rooms</h1>
+        
+    </div>
     <div>
       <CreateRoom />
       <JoinRoom />
