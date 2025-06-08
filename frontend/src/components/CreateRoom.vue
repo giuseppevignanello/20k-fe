@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-center">
         <button
-            class="bg-primary text-white font-bold p-05 px-4 rounded focus:outline-none focus:shadow-outline"
+            class="bg-primary text-white font-bold p-05 rounded"
             type="button" @click="showCreateRoomModal = true">
             Create Room
         </button>

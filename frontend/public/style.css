@@ -4,6 +4,7 @@
   --secondary-color: #2ecc71;
   --text-color: #333;
   --white-color: white;
+  --alert-color: #e74c3c;
 }
 /* endregion variables */
 
@@ -40,6 +41,14 @@
 
 .text-white {
     color: var(--white-color);
+}
+
+.bg-alert {
+    background-color: var(--alert-color);
+}
+
+.text-alert {
+    color: var(--alert-color);
 }
 
 /* endregion colors */
