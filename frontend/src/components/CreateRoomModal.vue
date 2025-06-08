@@ -3,22 +3,22 @@
         <div class="mb-3">
             <UiSelect
                 :label-text="'Punti'"
-                v-model="settings.score"
+                v-model="settings.maxScore"
                 :option-texts="['40', '20', '10']"
                 :option-values="[40, 20, 10]"
                 default-value="Seleziona il punteggio"
-                :error-condition="errors.score"
+                :error-condition="errors.maxScore"
                 error-text="Il punteggio è obbligatorio"
             />
         </div>
         <div class="mb-3">
             <UiSelect
-                :label-text="'Giocatori'"
-                v-model="settings.players"
+                :label-text="'Numero di Giocatori'"
+                v-model="settings.playersNum"
                 :option-texts="['4', '5']"
                 :option-values="[4, 5]"
                 default-value="Seleziona il numero di giocatori"
-                :error-condition="errors.players"
+                :error-condition="errors.playersNum"
                 error-text="Il numero di giocatori è obbligatorio"/>
         </div>
         
@@ -40,30 +40,30 @@ export default {
     data() {
         return {
             settings: {
-                players: "",
-                score: "",
+                playersNum: "",
+                maxScore: "",
             },
             errors: {
-                players: false,
-                score: false,
+                playersNum: false,
+                maxScore: false,
             },
         };
     },
     methods: {
         async createRoom() {
-            if (!this.settings.score) {
-                this.errors.score = true;
+            if (!this.settings.maxScore) {
+                this.errors.maxScore = true;
             } else {
-                this.errors.score = false;
+                this.errors.maxScore = false;
             }
 
-            if (!this.settings.players) {
-                this.errors.players = true;
+            if (!this.settings.playersNum) {
+                this.errors.playersNum = true;
             } else {
-                this.errors.players = false;
+                this.errors.playersNum = false;
             }
 
-            if (this.errors.score || this.errors.players) {
+            if (this.errors.maxScore || this.errors.playersNum) {
                 return;
             }
 
