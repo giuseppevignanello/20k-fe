@@ -306,40 +306,41 @@ export default {
 .players-circle {
     position: relative;
     width: 100%;
-    height: 100%;
+    height: 80%;
 }
 
 .user-card {
+    bottom: 0;
     position: absolute;
-    width: 300px;
+    width: 30%;
     height: 150px;
     transform-origin: center;
 }
 
 /* Positions for 5 players */
 .user-card.position-0 {
-    bottom: 25%;
+    bottom: 0%;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .user-card.position-1 {
-    bottom: 50%;
+    bottom: 35%;
     right: 10%;
 }
 
 .user-card.position-2 {
-    top: 0%;
-    right: 45%;
+    top: 10%;
+    right: 35%;
 }
 
 .user-card.position-3 {
-    top: 20%;
+    top: 40%;
     left: 5%;
 }
 
 .user-card.position-4 {
-    bottom: 30%;
+    bottom: 50%;
     left: 10%;
 }
 
