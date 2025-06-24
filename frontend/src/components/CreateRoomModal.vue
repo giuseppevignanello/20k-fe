@@ -21,10 +21,9 @@
                 :error-condition="errors.playersNum"
                 error-text="Il numero di giocatori è obbligatorio"/>
         </div>
-        
-
-
-        <button @click="createRoom">Create Room</button>
+        <UiButtonPrincipal
+            :click-action="createRoom"
+            button-text="Crea Stanza"/>
     </div>
 </template>
 
@@ -32,10 +31,12 @@
 <script>
 import axios from "axios";
 import UiSelect from "./ui/UiSelect.vue";
+import UiButtonPrincipal from "./ui/UiButtonPrincipal.vue";
 export default {
     name: "CreateRoomModal",
     components: {
         UiSelect,
+        UiButtonPrincipal,
     },
     data() {
         return {
@@ -68,7 +69,8 @@ export default {
             }
 
             try {
-                const response = await axios.post("http://localhost:3000/create-room", this.settings);
+                const baseUrl = import.meta.env.VITE_API_BASE_URL;
+                const response = await axios.post(`${baseUrl}/create-room`, this.settings);
                 this.$emit("room-created", response.data.roomId);
             } catch (error) {
                 //TODO: change this console.error with an efective error message

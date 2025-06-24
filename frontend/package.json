@@ -13,7 +13,8 @@
     "core-js": "^3.8.3",
     "mitt": "^3.0.1",
     "tailwindcss": "^4.0.2",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-i18n": "^11.1.7"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -21,9 +22,11 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/test-utils": "^2.4.6",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
-    "vite": "^6.0.11"
+    "vite": "^6.0.11",
+    "vue-jest": "^5.0.0-alpha.10"
   },
   "eslintConfig": {
     "root": true,

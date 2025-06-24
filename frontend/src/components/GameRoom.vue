@@ -81,13 +81,18 @@ export default {
 
             let userIndex = 0;
             const distributeNextCard = (index) => {
+                
+                // distribution completed
                 if (index >= dealerDistributionCards.value.length) {
                     dealerDistributionCards.value = [];
+                    gameData.dealer = selectedDealer.value;
                     isDistributionComplete.value = true;
                     setTimeout(() => {
-                        distributeFirstThreeCards();
+                        // distributeFirstThreeCards();
+                        // start suit selection phase
                         suitSelectionPhase.value = true;
-                    }, 2000);
+                        console.log("Dealer selection completed, starting suit selection phase");
+                    }, 1500);
                     return;
                 }
 

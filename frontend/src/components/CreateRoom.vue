@@ -1,10 +1,9 @@
 <template>
     <div class="flex justify-center">
-        <button
-            class="bg-primary text-white font-bold p-05 rounded"
-            type="button" @click="showCreateRoomModal = true">
-            Create Room
-        </button>
+        <UiButtonPrincipal
+            :click-action="() => showCreateRoomModal = true"
+            :button-text="$t('room.create_room')"
+        />
     </div>
     <UiModal :visible="showCreateRoomModal" @close="showCreateRoomModal = false">
         <CreateRoomModal @room-created="setRoomId" />
@@ -30,8 +29,9 @@
 <script>
 import CreateRoomModal from "./CreateRoomModal.vue"
 import UiModal from "./ui/UiModal.vue";
+import UiButtonPrincipal from "./ui/UiButtonPrincipal.vue";
 export default {
-    components: { CreateRoomModal, UiModal },
+    components: { CreateRoomModal, UiModal, UiButtonPrincipal },
     data() {
         return {
             showCreateRoomModal: false,
@@ -49,9 +49,6 @@ export default {
             try {
                 await navigator.clipboard.writeText(text);
                 this.copied = true;
-                // setTimeout(() => {
-                //     this.copied = false;
-                // }, 3000);
             } catch ($e) {
                 alert('Cannot copy');
             }

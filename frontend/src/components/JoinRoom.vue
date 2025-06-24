@@ -1,19 +1,23 @@
 <template>
     <div>
         <div class="flex justify-center mt-1" v-if="!isConnected">
-            <input class="shadow appearance-none border rounded p-05 px-3 text-gray-700 leading-tight" type="text"
-                v-model="joinRoomId" placeholder="Enter Room ID">
-            <button
-                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                type="button" @click="joinRoom">
-                Join Room
-            </button>
+            <UiInputText
+                v-model="joinRoomId"
+                default-value="$t('room.enter_room_id')"
+                label-text="$t('room.room_id')"
+                :error-condition="roomIdErrorText"
+                :error-text="roomIdErrorText"
+            />
+            <UiButtonPrincipal
+                :click-action="joinRoom"
+                :button-text="$t('room.join_room')"
+            />
         </div>
         <!-- room details -->
         <div v-if="isConnected" class="room-details">
-            <span><strong>Points:</strong> {{ roomDetails.score }}</span>
-            <span><strong>Users:</strong> {{ roomDetails.users.length }}</span>
-            <span><strong>Current User:</strong> {{ username }}</span>
+            <span><strong>{{ $t('common.points') }}</strong> {{ roomDetails.score }}</span>
+            <span><strong>{{ $t('common.users') }}:</strong> {{ roomDetails.users.length }}</span>
+            <span><strong>{{ $t('common.current_user') }}:</strong> {{ username }}</span>
         </div>
 
         <UiModal :visible="showAddUsernameModal" @close="showAddUsernameModal = false">
@@ -32,12 +36,15 @@ import axios from "axios";
 import UiModal from "./ui/UiModal.vue";
 import AddUserNameModal from "./AddUserNameModal.vue";
 import GameRoom from "./GameRoom.vue";
+import UiInputText from "./ui/UiInputText.vue";
+import UiButtonPrincipal from "./ui/UiButtonPrincipal.vue";
 
 export default {
-    components: { UiModal, AddUserNameModal, GameRoom },
+    components: { UiModal, AddUserNameModal, GameRoom, UiInputText, UiButtonPrincipal },
     data() {
         return {
             joinRoomId: "",
+            roomIdErrorText: null,
             showAddUsernameModal: false,
             isConnected: false,
             roomDetails: null,
@@ -54,17 +61,24 @@ export default {
     },
     methods: {
         async joinRoom() {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL;
             const response = await axios.get(
-                `http://localhost:3000/room-exists/${this.joinRoomId}`
+                `${baseUrl}/room-exists/${this.joinRoomId}`
             );
-            if (!response.data.exists) {
-                alert("Room does not exist!");
-                return;
-            } else if (response.data.full) {
-                alert("Room is full!");
+
+            this.roomIdErrorText = !this.joinRoomId;
+            
+            if(!this.joinRoomId) {
+                this.roomIdErrorText = "$t('error.room_id_required')";
                 return;
             }
-
+            else if (!response.data.exists) {
+                this.roomIdErrorText = "$t('error.room_not_found')";
+                return;
+            } else if (response.data.full) {
+                this.roomIdErrorText = "$t('error.room_full')";
+                return;
+            }
             this.showAddUsernameModal = true;
         },
         handleUserJoined({ username, roomDetails, score, users }) {
@@ -93,8 +107,8 @@ export default {
             }
         });
         window.addEventListener("room-full", () => {
-            // TODO: Change this alert with an effective message;
-            alert("Room is full!");
+            this.roomIdErrorText = "$t('error.room_full')";
+            return;
         });
     },
 };

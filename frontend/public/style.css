@@ -80,7 +80,9 @@
 .p-2{
     padding: 2rem;
 }
+/* endregion padding */
 
+/* region margin  */
 .mt-1 {
     margin-top: 1rem;
 }
@@ -88,5 +90,5 @@
 .mt-2 {
     margin-top: 2rem;
 }
-/* endregion padding */
+/* endregion margin */
 

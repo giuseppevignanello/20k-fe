@@ -1,18 +1,26 @@
 <template>
     <div>
         <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input v-model="username" type="text" class="form-control" name="username" id="username" value="username"
-                aria-describedby="helpId" placeholder="" />
+            <UiInputText
+                v-model="username"
+                default-value="Inserisci il tuo nome utente"
+                label-text="Nome Utente"
+                :error-condition="!username"
+                error-text="Il nome utente è obbligatorio"
+            />
         </div>
-
-        <button @click="joinRoomWithUserName">Join Room</button>
+        <UiButtonPrincipal
+            :click-action="joinRoomWithUserName"
+            button-text="Unisciti alla stanza"
+        />
     </div>
 </template>
 
 
 <script>
 import { websocket } from "../websocket"
+import UiInputText from "./ui/UiInputText.vue";
+import UiButtonPrincipal from "./ui/UiButtonPrincipal.vue";
 export default {
     props: {
         roomId: {
@@ -21,6 +29,11 @@ export default {
         },
 
     },
+    components: {
+        UiInputText,
+        UiButtonPrincipal,
+    },
+    name: "AddUserNameModal",
     data() {
         return {
             username: "",
@@ -29,7 +42,7 @@ export default {
     },
     methods: {
         connectWebSocket() {
-            websocket.connect("ws://localhost:3000");
+            websocket.connect(import.meta.env.VITE_WS_BASE_URL);
         },
         async joinRoomWithUserName() {
             if (!this.username) {
