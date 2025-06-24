@@ -69,7 +69,7 @@ export default {
             }
 
             try {
-                const baseUrl = import.meta.env.VITE_API_BASE_URL;
+                const baseUrl = import.meta.env.VITE_API_URL;
                 const response = await axios.post(`${baseUrl}/create-room`, this.settings);
                 this.$emit("room-created", response.data.roomId);
             } catch (error) {

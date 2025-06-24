@@ -1,7 +1,9 @@
 <template>
-            <label>{{ labelText }}</label>
-            <input type="text" v-model="model" :placeholder="defaultValue" class="form-control" :name="model" :id="model" :value="model"/>
-            <ErrorText :condition="errorCondition" :text="errorText"/>
+    <div class="flex flex-col">
+        <label class="font-bold font-size-1">{{ labelText }}</label>
+        <input type="text" v-model="model" :placeholder="defaultValue" class="input-text" :name="model" :id="model" :value="model"/>
+        <ErrorText :condition="errorCondition" :text="errorText"/>
+    </div>
 </template>
 
 <script>

@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div class="flex justify-center mt-1" v-if="!isConnected">
+        <div class="flex justify-center gap-2 mt-1" v-if="!isConnected">
             <UiInputText
                 v-model="joinRoomId"
-                default-value="$t('room.enter_room_id')"
-                label-text="$t('room.room_id')"
+                :default-value="$t('room.enter_room_id')"
+                :label-text="$t('room.room_id')"
                 :error-condition="roomIdErrorText"
                 :error-text="roomIdErrorText"
             />
@@ -61,7 +61,7 @@ export default {
     },
     methods: {
         async joinRoom() {
-            const baseUrl = import.meta.env.VITE_API_BASE_URL;
+            const baseUrl = import.meta.env.VITE_API_URL;
             const response = await axios.get(
                 `${baseUrl}/room-exists/${this.joinRoomId}`
             );
@@ -69,14 +69,14 @@ export default {
             this.roomIdErrorText = !this.joinRoomId;
             
             if(!this.joinRoomId) {
-                this.roomIdErrorText = "$t('error.room_id_required')";
+                this.roomIdErrorText = $t('error.room_id_required');
                 return;
             }
             else if (!response.data.exists) {
-                this.roomIdErrorText = "$t('error.room_not_found')";
+                this.roomIdErrorText = $t('error.room_not_found');
                 return;
             } else if (response.data.full) {
-                this.roomIdErrorText = "$t('error.room_full')";
+                this.roomIdErrorText = $t('error.room_full');
                 return;
             }
             this.showAddUsernameModal = true;
@@ -107,7 +107,7 @@ export default {
             }
         });
         window.addEventListener("room-full", () => {
-            this.roomIdErrorText = "$t('error.room_full')";
+            this.roomIdErrorText = $t('error.room_full');
             return;
         });
     },

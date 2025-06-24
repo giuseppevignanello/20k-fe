@@ -17,19 +17,19 @@
                 </li>
             </ul>
         </div>
-        <div v-if="user.userCards">
+        <div v-if="user.userCards" class="hand-container">
             <div v-if="isCurrentUser">
-                <ul class="flex gap-2">
-                    <li class="list-unstyled" v-for="(card) in user.userCards" :key="card.value + card.suit">
+                <ul class="card-hand">
+                    <li v-for="(card, index) in user.userCards" :key="card.value + card.suit" :class="getCardClass(index)">
                         <img :src="`/cards/${card.value + card.suit}.png`" :alt="`${card.value} ${card.suit}`"
-                            width="80px" height="100px" />
+                            class="card-img" />
                     </li>
                 </ul>
             </div>
-            <div v-else>
-                <ul class="flex gap-2">
-                    <li class="list-unstyled" v-for="(index) in getBackCardCounter()" :key="index">
-                        <img :src="`/back-card.jpg`" alt="back-card" width="80px" height="100px" />
+            <div v-else class="hand-container">
+                <ul class="card-hand-back">
+                    <li v-for="(card, index) in getBackCardCounter()" :key="index" :class="getCardClass(index)">
+                        <img :src="`/back-card.jpg`" alt="back-card" class="card-img" />
                     </li>
                 </ul>
             </div>
@@ -64,6 +64,9 @@ export default {
         };
     },
     methods: {
+        getCardClass(index) {
+            return index < 3 ? 'card-bottom' : 'card-top';
+        },
         getBackCardCounter() {
             if (this.status == 'three-card-distributed') {
                 return 3;
@@ -83,6 +86,56 @@ export default {
 
 
 <style scoped>
+.card-hand, .card-hand-back {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.card-hand li, .card-hand-back li {
+  position: absolute;
+  transition: transform 0.3s ease, z-index 0.3s;
+}
+
+.card-img {
+  width: 80px;
+  height: 100px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.card-bottom {
+    z-index: 1;
+}
+
+.card-bottom:nth-child(1) {
+  transform: translate(-55px, 10px) rotate(-20deg);
+}
+.card-bottom:nth-child(2) {
+  transform: translate(0px, 5px) rotate(0deg);
+}
+.card-bottom:nth-child(3) {
+  transform: translate(55px, 10px) rotate(20deg);
+}
+
+.card-top:nth-child(4) {
+  transform: translate(-35px, -60px) rotate(-10deg);
+}
+.card-top:nth-child(5) {
+  transform: translate(35px, -60px) rotate(10deg);
+}
+
+.card-hand li:hover {
+  transform: translateY(-20px) scale(1.05) !important;
+  z-index: 10;
+}
+
 .user-card p {
     margin: 5px 0;
 }

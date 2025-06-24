@@ -3,15 +3,15 @@
         <div class="mb-3">
             <UiInputText
                 v-model="username"
-                default-value="Inserisci il tuo nome utente"
-                label-text="Nome Utente"
-                :error-condition="!username"
-                error-text="Il nome utente è obbligatorio"
+                :default-value="$t('user.enter_username')"
+                :label-text="$t('user.username')"
+                :error-condition="errorText"
+                :error-text="errorText"
             />
         </div>
         <UiButtonPrincipal
             :click-action="joinRoomWithUserName"
-            button-text="Unisciti alla stanza"
+            :button-text="$t('room.join_room')"
         />
     </div>
 </template>
@@ -36,18 +36,18 @@ export default {
     name: "AddUserNameModal",
     data() {
         return {
+            errorText: null,
             username: "",
             messages: [],
         };
     },
     methods: {
         connectWebSocket() {
-            websocket.connect(import.meta.env.VITE_WS_BASE_URL);
+            websocket.connect(import.meta.env.VITE_WS_URL);
         },
         async joinRoomWithUserName() {
             if (!this.username) {
-                //TODO: change this alert with an efective error message
-                alert("Scrivi un nome utente");
+                this.errorText = this.$t("error.username_required");
                 return;
             }
             websocket.sendMessage({

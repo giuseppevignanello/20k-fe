@@ -18,7 +18,7 @@
                 </UiModal>
             </div>
             <div v-if="isDistributionComplete">
-                Il dealer è {{ gameData.dealer.username }}
+                Il dealer è {{ gameData.dealer?.username }}
             </div>
             <div v-if="gameData.suit">
                 La briscola è {{ gameData.suit }}
@@ -88,10 +88,9 @@ export default {
                     gameData.dealer = selectedDealer.value;
                     isDistributionComplete.value = true;
                     setTimeout(() => {
-                        // distributeFirstThreeCards();
-                        // start suit selection phase
+                        distributeFirstThreeCards();
+                        startSuitSelectionPhase();
                         suitSelectionPhase.value = true;
-                        console.log("Dealer selection completed, starting suit selection phase");
                     }, 1500);
                     return;
                 }
@@ -115,7 +114,6 @@ export default {
                 user.userCards = userFirstThreeCards.value.value;
             });
             gameData.status = "three-card-distributed";
-            startSuitSelectionPhase();
 
         }
 
@@ -251,7 +249,7 @@ export default {
     created() {
         window.addEventListener("dealer-selection", (event) => {
             this.dealerDistributionCards = event.detail.distributedCards;
-            this.selectedDealer = event.detail.tenOfDenariPlayer;
+            this.selectedDealer = event.detail.dealer;
             this.distributeDealerSelectionCards();
         })
         window.addEventListener("initial-cards", (event) => {

@@ -10,9 +10,14 @@ export default {
         "users" : "Users",
         "current_user" : "Current User",
     },
+    "user" : {
+        "username" : "Username",
+        "enter_username" : "Enter your username",
+    },
       "error": { 
         "room_id_required" : "Room ID is required",
         "room_not_found" : "Room not found",
         "room_full" : "The room is full",
+        "username_required" : "Username is required",
     }
 }

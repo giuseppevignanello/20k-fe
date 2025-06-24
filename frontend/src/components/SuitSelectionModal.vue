@@ -46,8 +46,5 @@ export default {
             });
         },
     },
-    mounted() {
-        console.log("SuitSelectionModal mounted");
-    },
 };
 </script>

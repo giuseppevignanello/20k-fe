@@ -10,9 +10,14 @@ export default {
         "users" : "Utenti",
         "current_user" : "Utente attuale",
     },
+    "user" : {
+        "username" : "Nome utente",
+        "enter_username" : "Inserisci il nome utente",
+    },
     "error": { 
         "room_id_required" : "L'ID della stanza è richiesto",
         "room_not_found" : "Stanza non trovata",
         "room_full" : "La stanza è piena",
+        "username_required" : "Il nome utente è richiesto",
     }
 }
